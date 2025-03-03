@@ -33,7 +33,7 @@ class sahEngine:
             if self.sahovska_tabla.is_attacked_by(self.boja_figura, polje):
                 vrijednost_centralnih_polja += 0.05
             if self.sahovska_tabla.is_attacked_by(not self.boja_figura, polje):
-                vrijednost_centralnih_polja -= 0.0
+                vrijednost_centralnih_polja -= 0.05
         return vrijednost_centralnih_polja
     
     def gaviot_tablebase(self):
