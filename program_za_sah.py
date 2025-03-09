@@ -157,8 +157,7 @@ class sahEngine:
         else:
             return najbolji_potez
         
-#---------------------------------------------------------------------------------------------------------------------------------klasa Igra
-        
+#---------------------------------------------------------------------------------------------------------------------------------klasa Igra  
 class Igra:
 #Конструктор класе Igra
 #Oсновни атрибути ове класу су: шаховска табла, величина поља, димензије плоче, слике фигура и плоча. Класа садржи и једну методу, која се назива crtanje_table().
@@ -167,10 +166,12 @@ class Igra:
         self.velicina_polja=80
         self.dimenzije_ploce=self.velicina_polja*8
         self.slike=self.ucitaj_slike(self.velicina_polja)
+#Функција set_mode()се користи за креирање графичког прозора (екрана) који ће представљати шаховску плочу
         self.ploca=PY.display.set_mode((self.dimenzije_ploce,self.dimenzije_ploce))
         PY.display.set_caption("Sah")
         self.crtanje_table()
-        
+#---------------------------------------------------------------------------------------------------------------
+#Функција ucitaj_slike() има улогу да се направи рјечник (енг. dictionary) од учитаних слика, односно да се свакој слици придружи одговарајућа ознака (кључ)
     def ucitaj_slike(self,velicina):
         slike={} #dictionary, pravi se lista slika sa odgovarajucim kljucevima i vrijednostima
         oznake_figura=['P','N','B','R','Q','K','p','n','b','r','q','k']
@@ -187,60 +188,87 @@ class Igra:
         slike[oznake_figura[10]]=PY.image.load(r"C:\Users\Korisnik\Desktop\KOD_DIPLOMSKI\sah_figure\QC.png")
         slike[oznake_figura[11]]=PY.image.load(r"C:\Users\Korisnik\Desktop\KOD_DIPLOMSKI\sah_figure\KC.png")
         for oznaka in oznake_figura:
+            #Скалирање фигура на димензију поља
             slike[oznaka]=PY.transform.scale(slike[oznaka],(velicina,velicina))
         return slike
-    
+#---------------------------------------------------------------------------------------------------------------
+#Функција за цртање шаховске табле
     def crtanje_table(self):
         boje_polja=[(255,255,255),(128,128,128)]
         for red in range(8):
             for kolona in range(8):
+                #Окретање плоче (бијеле фигуре на доњој страни)
                 novi_red=7-red
                 trenutna_boja=boje_polja[(red+kolona)%2]
+                #Цртање шаховског поља (функција pygame.draw.rect())
                 PY.draw.rect(self.ploca,trenutna_boja,PY.Rect(kolona*self.velicina_polja,\
                 red*self.velicina_polja,self.velicina_polja,self.velicina_polja))
+                #Провјера да ли се фигура налази на шаховском пољу
                 figura=self.sahovska_tabla.piece_at(sah.square(kolona,novi_red))
                 if figura:
                     slika_figura=self.slike[str(figura)]
+                    #Функција blit()служи за приказивање једног објекта преко другог (слика фигура на шаховској плочи)
                     self.ploca.blit(slika_figura,(kolona*self.velicina_polja,red*self.velicina_polja))
+        #Функција flip() се користи за освјежавање комплетног приказа на екрану. Ово је кључно за приказивање промјена које су се направиле на екрану током игре.
         PY.display.flip()
-    
+#---------------------------------------------------------------------------------------------------------------
+# Функција која враћа бројчану вриједнoст (индекс) поља на којем се налази курсор миша. У chess библиотеци,
+# шаховска табла је представљена матрицом од 64 поља, нумерисаним од 0 до 63. Аргумент ове функије је позиција
+# курсора која је представљена као tuple(координатe (x,y))
     def detekcija_poteza(self,pozicija_kursora):
         sahovska_tabla_red=pozicija_kursora[1]//self.velicina_polja
         sahovska_tabla_kolona=pozicija_kursora[0]//self.velicina_polja
         nova_kolona,novi_red=self.transformacija_koordinata(sahovska_tabla_kolona,sahovska_tabla_red)
+        #Функција sah.square() претвара колону и ред у индекс поља
         return sah.square(nova_kolona,novi_red)
-    
+#---------------------------------------------------------------------------------------------------------------
+# Функција transformacija_koordinata() служи за трансформацију координатног система графичког прозора у Pygame-у 
+# (почетак у горњем лијевом углу) у координатни систем шаховске табле (почетак у доњем десном углу). 
+# Ова трансформација је неопходна за правилно представљање шаховских потеза на графичком прозору у Pygame-у.
     def transformacija_koordinata(self,x, y):
         pygame_x = x
         pygame_y = 7 - y
         return pygame_x, pygame_y
-    
+#---------------------------------------------------------------------------------------------------------------
+# Функција prikaz_legalnih_poteza() има улогу да се означе сви легални потези за селектовану фигуру
     def prikaz_legalnih_poteza(self,polje):
         legalni_potezi=list(self.sahovska_tabla.legal_moves)
         legalna_polja=[]
         for potez in legalni_potezi:
+            #Провјера који легални потези почињу из селектованог поља
+            #from_square враћа цјелобројни индекс почетног поља за одговарајући потез
             if potez.from_square==polje:
+                #to_square враћа цјелобројни индекс који представља одредишно поље на шаховској табли за одређени потез
                 legalna_polja.append(potez.to_square)
         for polje in legalna_polja:
             kolona=polje%8
             red=7-polje//8
+            #Цртање круга на свим шаховским пољима на којa је могуће доћи са селектованом фигуром
             centar_kruznice=((kolona*self.velicina_polja)+self.velicina_polja//2,\
             (red*self.velicina_polja)+self.velicina_polja//2)
             PY.draw.circle(self.ploca,(102,178,255),centar_kruznice,self.velicina_polja//8)
-            
+#---------------------------------------------------------------------------------------------------------------
+#Функција за одлагање поједених фигура у симулацији (софтвер RoboDK)
     def ostavljanje_pojedenih_figura(self,figura_napadnuta,pojedena_figura,koordinatni_sistem_odlaganje_bijele,koordinatni_sistem_odlaganje_crne):
+        #Приступ глобалним промјењивима унутар функције (употреба кључне ријечи global)
+        #Тренутни број поједених бијелих и црних фигура
         global brojac_pojedenih_bijele
         global brojac_pojedenih_crne
+        #Одлагање бијелих поједених фигура
         if figura_napadnuta.color:
+            #Везивање поједене фигура за жељени координатни систем помоћу функције setParent
             pojedena_figura.setParent(koordinatni_sistem_odlaganje_bijele)
             translacija_x=25*brojac_pojedenih_bijele
             brojac_pojedenih_bijele+=1
             translacija_y=11
+            #Хомогена трансформациона матрица, помјерање по х оси
             matrica_translacije=robomath.Mat(   [[1, 0, 0, translacija_x], 
                                      [0, 0, -1, translacija_y], 
                                      [0, 1, 0, 1], 
                                      [0, 0, 0, 1]])
+            #Функција setPose() се користи за постављање положаја и оријентације објекта у софтверу RoboDK
             pojedena_figura.setPose(matrica_translacije)
+            #Одлагање црних поједених фигура
         else:
             pojedena_figura.setParent(koordinatni_sistem_odlaganje_crne)
             translacija_x=25*brojac_pojedenih_crne
@@ -251,14 +279,26 @@ class Igra:
                                      [0, 1, 0, 1], 
                                      [0, 0, 0, 1]])
             pojedena_figura.setPose(matrica_translacije)
+#---------------------------------------------------------------------------------------------------------------
+# Функција за помјерање фигура помоћу роботске руке у софтверу RoboDK. 
+# Аргументи ове функције су: ред и колона селектованог и жељеног поља, 
+# селектована и нападнута фигура (ако је нема, вриједност је None).
     def pomjeranje_figura(self,red_1,kolona_1,red_2,kolona_2,figura,figura_napadnuta):
         #--------------------------------------------------------------->Lista programa  
+        #Таргет представља специфичну позицију и орјентацију коју робот треба да достигне у свом радном простору
+        #Tаргет за почетну позицију роботске руке (употреба методе robomath.Pose (x, y, z, rx, ry, rz))
         target_pocetna=robomath.Pose(170,85,130,180,0,-90)
+        #Таргети за одлагање пјешака и тешких фигура
         target_ostavljanje_figure=robomath.Pose(165,-110,110,180,0,-90)
         target_ostavljanje_figure_spustanje_1=robomath.Pose(165,-110,38,180,0,-90)
         target_ostavljanje_figure_spustanje_2=robomath.Pose(165,-110,32,180,0,-90)
+        #Координатни системи за одлагање поједених фигура
         koordinatni_sistem_odlaganje_bijele=RDK.Item("odlaganje_figura_bijele")
         koordinatni_sistem_odlaganje_crne=RDK.Item("odlaganje_figura_crne")
+        #Робот и хватаљка на радној станици
+        # У софтверу RoboDK, медота RDK.Item() служи за приступање објектима из радне станице на основу њиховог имена и типа. 
+        # Ова метода омогућава корисницима да приступе различитим елементима радне станице, као што су роботи, алати, програми 
+        # и да њима манипулишу путем Python скрипте.
         robot=RDK.Item("robot")
         hvataljka=RDK.Item("Tool_1")
         ispustanje_figure=RDK.Item("ispustanje_figure",robolink.ITEM_TYPE_PROGRAM)
