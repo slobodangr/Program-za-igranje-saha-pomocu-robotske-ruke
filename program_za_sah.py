@@ -123,7 +123,7 @@ class sahEngine:
         lista_legalnih_poteza=list(self.sahovska_tabla.legal_moves)
         '''Naizmjenicno prebacivanje igraca i inicijalizacija promjenjive
         novi_current_eval koja ima ulogu cuvanje najbolje vrijednosti
-        evaluacije za svaki nivo pretrazivanja [2]'''
+        evaluacije za svaki nivo pretrazivanja'''
         novi_current_eval=0
         if (dubina%2!=0):
             novi_current_eval=float(-math.inf)
@@ -131,7 +131,7 @@ class sahEngine:
             novi_current_eval=float(math.inf)
         '''Simulacija igre i gradjenje stabla poteza, pri cemu se na
         svakom nivou porede najbolje vrijednosti koje se vracaju u
-        roditeljski cvor [3]'''
+        roditeljski cvor'''
         for potez in lista_legalnih_poteza:
             self.sahovska_tabla.push(potez)
             evaluacija=self.Minimax(novi_current_eval,dubina+1)
@@ -141,7 +141,7 @@ class sahEngine:
                 novi_current_eval=evaluacija
             elif(evaluacija<novi_current_eval and dubina%2==0):
                 novi_current_eval=evaluacija
-            '''Optimizacija minimaks algoritma [4]'''
+            '''Optimizacija minimaks algoritma'''
             '''Igrac koji maksimizira prvi na potezu'''
             if (current_eval!=None and evaluacija<current_eval and dubina%2==0):
                 self.sahovska_tabla.pop()
@@ -151,7 +151,7 @@ class sahEngine:
                 self.sahovska_tabla.pop()
                 break
             self.sahovska_tabla.pop()
-        '''Povratne vrijendosti Minimax funckije [5]'''
+        '''Povratne vrijendosti Minimax funckije'''
         if (dubina>1):
             return novi_current_eval
         else:
