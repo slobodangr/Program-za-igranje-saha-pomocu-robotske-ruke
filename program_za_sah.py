@@ -301,6 +301,7 @@ class Igra:
         # и да њима манипулишу путем Python скрипте.
         robot=RDK.Item("robot")
         hvataljka=RDK.Item("Tool_1")
+        #Листа програма за отварање и затварање хватаљке који су креирани у софтверу RoboDK
         ispustanje_figure=RDK.Item("ispustanje_figure",robolink.ITEM_TYPE_PROGRAM)
         otvorena_hvataljka_figure=RDK.Item("otvorena_hvataljka_figure",robolink.ITEM_TYPE_PROGRAM)
         zatvorena_hvataljka_12=RDK.Item("zatvorena_hvataljka_12",robolink.ITEM_TYPE_PROGRAM)
@@ -308,6 +309,7 @@ class Igra:
         zatvorena_hvataljka_14=RDK.Item("zatvorena_hvataljka_14",robolink.ITEM_TYPE_PROGRAM)
         otvorena_hvataljka_51=RDK.Item("otvorena_hvataljka_51",robolink.ITEM_TYPE_PROGRAM)
         #----------------------------------------------------------->Prilazi za pjesake
+        #Креирање дводимензионалне листе која садржи прилазе изнад пјешаке за сва шаховска поља. Сваки елемент листе садржи 6 параметара, а то су 3 транслације и 3 ротације.
         pjesak_prilaz=[]
         lista_prilaza_1=[]
         for i in range(8):
@@ -323,6 +325,7 @@ class Igra:
             pjesak_prilaz.append(lista_prilaza_1)
             lista_prilaza_1=[]
         #----------------------------------------------------------->Hvatanje pjesaka
+        #Креирање дводимензионалне листе која садржи прилазе за пјешаке током њиховог узимања или спуштања
         pjesak_hvatanje=[]
         lista_prilaza_2=[]
         for i in range(8):
@@ -337,7 +340,8 @@ class Igra:
                 lista_prilaza_2.append(lista)
             pjesak_hvatanje.append(lista_prilaza_2)
             lista_prilaza_2=[]
-         #----------------------------------------------------------->Prilaz figure
+        #----------------------------------------------------------->Prilaz figure
+        #Креирање дводимензионалне листе која садржи прилазе изнад осталих фигура за сва шаховска поља
         figure_prilaz=[]
         lista_prilaza_3=[]
         for i in range(8):
@@ -352,7 +356,8 @@ class Igra:
                 lista_prilaza_3.append(lista)
             figure_prilaz.append(lista_prilaza_3)
             lista_prilaza_3=[]
-         #----------------------------------------------------------->Hvatanje figure
+        #----------------------------------------------------------->Hvatanje figure
+        #Креирање дводимензионалне листе која садржи прилазе за остале фигуре током њиховог узимања или спуштања
         figure_hvatanje=[]
         lista_prilaza_4=[]
         for i in range(8):
@@ -367,7 +372,9 @@ class Igra:
                 lista_prilaza_4.append(lista)
             figure_hvatanje.append(lista_prilaza_4)
             lista_prilaza_4=[]
-         #------------------------------------------------------------->podizanja za slobodna kretanja(manja visina podizanja)
+        #------------------------------------------------------------->podizanja za slobodna kretanja(manja visina podizanja)                                           
+        '''Креирање дводимензионалне листе која садржи ниже прилазе током слободног кретања фигура (нема узимања противничке фигуреи дијагоналног помјерања), 
+        како би се избацило непотребно велико подизање. Ово се односи на све фигуре осим ловца и скакача због њиховог сложенијег кретања.'''
         prilaz_slobodno_kretanja=[]
         lista_prilaza_5=[]
         for i in range(8):
@@ -382,22 +389,37 @@ class Igra:
                 lista_prilaza_5.append(lista)
             prilaz_slobodno_kretanja.append(lista_prilaza_5)
             lista_prilaza_5=[]
+        '''Таргети за ниже прилазе током слободног кретања. Аргументи који се просљеђују методи robomath.Pose() су три транслације и ротације 
+        које се налазе у дводимензионалној листи (матрици) прилаза за слободно кретања фигура. Приступ одговарајућем елементу листе се врши
+        помоћу реда и колоне селектованог шаховског поља.'''
         target_mali_prilaz_1=robomath.Pose(prilaz_slobodno_kretanja[red_1][kolona_1][0],prilaz_slobodno_kretanja[red_1][kolona_1][1],prilaz_slobodno_kretanja[red_1][kolona_1][2],prilaz_slobodno_kretanja[red_1][kolona_1][3],prilaz_slobodno_kretanja[red_1][kolona_1][4],prilaz_slobodno_kretanja[red_1][kolona_1][5])
         target_mali_prilaz_2=robomath.Pose(prilaz_slobodno_kretanja[red_2][kolona_2][0],prilaz_slobodno_kretanja[red_2][kolona_2][1],prilaz_slobodno_kretanja[red_2][kolona_2][2],prilaz_slobodno_kretanja[red_2][kolona_2][3],prilaz_slobodno_kretanja[red_2][kolona_2][4],prilaz_slobodno_kretanja[red_2][kolona_2][5])   
+        # Провјера да ли се узима противничка фигура (ако је нема, фигура се помјера на слободно поље)
         if figura_napadnuta is None: #---------------------------------------------------------->Pomicanje figure na slobodno polje
+            #Порвјера да ли је селектована фигура пјешак
             if figura and figura.piece_type==sah.PAWN:
+                #Таргети за прилаз и хватање пјешака када се помјера на слободно поље
+                #Почетно (селектовано) поље
                 target_prilaz_1=robomath.Pose(pjesak_prilaz[red_1][kolona_1][0],pjesak_prilaz[red_1][kolona_1][1],pjesak_prilaz[red_1][kolona_1][2],pjesak_prilaz[red_1][kolona_1][3],pjesak_prilaz[red_1][kolona_1][4],pjesak_prilaz[red_1][kolona_1][5])
                 target_hvatanje_1=robomath.Pose(pjesak_hvatanje[red_1][kolona_1][0],pjesak_hvatanje[red_1][kolona_1][1],pjesak_hvatanje[red_1][kolona_1][2],pjesak_hvatanje[red_1][kolona_1][3],pjesak_hvatanje[red_1][kolona_1][4],pjesak_hvatanje[red_1][kolona_1][5])
+                #Крајње (жељено) поље
                 target_prilaz_2=robomath.Pose(pjesak_prilaz[red_2][kolona_2][0],pjesak_prilaz[red_2][kolona_2][1],pjesak_prilaz[red_2][kolona_2][2],pjesak_prilaz[red_2][kolona_2][3],pjesak_prilaz[red_2][kolona_2][4],pjesak_prilaz[red_2][kolona_2][5])
                 target_hvatanje_2=robomath.Pose(pjesak_hvatanje[red_2][kolona_2][0],pjesak_hvatanje[red_2][kolona_2][1],pjesak_hvatanje[red_2][kolona_2][2],pjesak_hvatanje[red_2][kolona_2][3],pjesak_hvatanje[red_2][kolona_2][4],pjesak_hvatanje[red_2][kolona_2][5])
+                #Дио кода којим се остварује прилаз, узимање и премјештање пјешака са почетног на жељено поље
+                #МоveL() је метродa која омогућава линеарно кретање робота до задатог таргета
                 robot.MoveL(target_prilaz_1)
+                #Функција RunProgram() омогућава да се покрене одређени програм унутар софтвера RoboDK
                 otvorena_hvataljka_51.RunProgram()
+                '''Функција time.sleep() унутар while петља обезбјеђује да се хватаљка не креће током њеног
+                отварања или затварња, односно да се не прелази на идући дио кода док се не изврши програм
+                за затварање или отварање хватаљке.'''
                 while otvorena_hvataljka_51.Busy():
                     tm.sleep(0.1)
                 robot.MoveL(target_hvatanje_1)
                 zatvorena_hvataljka_10_5.RunProgram()
                 while zatvorena_hvataljka_10_5.Busy():
                     tm.sleep(0.1)
+                #Хватање пјешака помоћу функицје AttachClosest () (омогућaва да се пјешак закачи за хватаљку у симулацији)
                 hvataljka.AttachClosest()
                 robot.MoveL(target_mali_prilaz_1)
                 robot.MoveL(target_mali_prilaz_2)
@@ -408,16 +430,22 @@ class Igra:
                     tm.sleep(0.1)
                 robot.MoveL(target_prilaz_2)
                 robot.MoveL(target_pocetna)
+            #Случај када се остале фигуре помјерају на слободно поље
             else:
+                #Таргети за прилаз и хватање фигура када се помјерају на слободно поље
+                #Почетно (селектовано) поље
                 target_prilaz_1=robomath.Pose(figure_prilaz[red_1][kolona_1][0],figure_prilaz[red_1][kolona_1][1],figure_prilaz[red_1][kolona_1][2],figure_prilaz[red_1][kolona_1][3],figure_prilaz[red_1][kolona_1][4],figure_prilaz[red_1][kolona_1][5])
                 target_hvatanje_1=robomath.Pose(figure_hvatanje[red_1][kolona_1][0],figure_hvatanje[red_1][kolona_1][1],figure_hvatanje[red_1][kolona_1][2],figure_hvatanje[red_1][kolona_1][3],figure_hvatanje[red_1][kolona_1][4],figure_hvatanje[red_1][kolona_1][5])
+                #Крајње (жељено) поље
                 target_prilaz_2=robomath.Pose(figure_prilaz[red_2][kolona_2][0],figure_prilaz[red_2][kolona_2][1],figure_prilaz[red_2][kolona_2][2],figure_prilaz[red_2][kolona_2][3],figure_prilaz[red_2][kolona_2][4],figure_prilaz[red_2][kolona_2][5])
                 target_hvatanje_2=robomath.Pose(figure_hvatanje[red_2][kolona_2][0],figure_hvatanje[red_2][kolona_2][1],figure_hvatanje[red_2][kolona_2][2],figure_hvatanje[red_2][kolona_2][3],figure_hvatanje[red_2][kolona_2][4],figure_hvatanje[red_2][kolona_2][5])
+                #Дио кода којим се остварује прилаз, узимање и премјештање осталих фигура са почетног на жељено поље
                 robot.MoveL(target_prilaz_1)
                 otvorena_hvataljka_figure.RunProgram()
                 while otvorena_hvataljka_figure.Busy():
                     tm.sleep(0.1)
                 robot.MoveL(target_hvatanje_1)
+                #Провјера типа фигуре која се врши због позива одговарајућег програма за затврање хватаљке.
                 if figura.piece_type==sah.ROOK or figura.piece_type==sah.KING or figura.piece_type==sah.QUEEN:
                     zatvorena_hvataljka_14.RunProgram()
                     while zatvorena_hvataljka_14.Busy():
@@ -427,6 +455,8 @@ class Igra:
                     while zatvorena_hvataljka_12.Busy():
                         tm.sleep(0.1)
                 hvataljka.AttachClosest()
+                '''Провјера типа фигуре која омогућава оптимизацију кретања робота, смањујући непотребно подизање фигура. 
+                У случају даме и краља, нижа подизања су обезбјеђена само за вертикално и хоризонтално помјерање, док се за дијагонално кретање користе виша подизања.'''
                 if figura.piece_type==sah.ROOK or (figura.piece_type==sah.KING and (red_1==red_2 or kolona_1==kolona_2)) or (figura.piece_type==sah.QUEEN and (red_1==red_2 or kolona_1==kolona_2)):
                     robot.MoveL(target_mali_prilaz_1)
                     robot.MoveL(target_mali_prilaz_2)
@@ -440,13 +470,21 @@ class Igra:
                     tm.sleep(0.1)
                 robot.MoveL(target_prilaz_2)
                 robot.MoveL(target_pocetna)
-        else:#---------------------------------------------------------->Slucaj kada se figura protivnika uzima
-            if figura_napadnuta.piece_type==sah.PAWN:#----------------------------------->Slucaj kad pjesak uzima pjesaka (1)
+        #Случај када се узима противничка фигура
+        else:
+            #Испитивање која фигура је на потезу и која фигура је узета
+            #Случај када пјешак узима пјешака
+            if figura_napadnuta.piece_type==sah.PAWN:
                 if figura and figura.piece_type==sah.PAWN:
+                    #Таргети за прилаз и хватање пјешака (почетно и крајње поље)
+                    #Почетно (селектовано) поље
                     target_prilaz_1=robomath.Pose(pjesak_prilaz[red_1][kolona_1][0],pjesak_prilaz[red_1][kolona_1][1],pjesak_prilaz[red_1][kolona_1][2],pjesak_prilaz[red_1][kolona_1][3],pjesak_prilaz[red_1][kolona_1][4],pjesak_prilaz[red_1][kolona_1][5])
                     target_hvatanje_1=robomath.Pose(pjesak_hvatanje[red_1][kolona_1][0],pjesak_hvatanje[red_1][kolona_1][1],pjesak_hvatanje[red_1][kolona_1][2],pjesak_hvatanje[red_1][kolona_1][3],pjesak_hvatanje[red_1][kolona_1][4],pjesak_hvatanje[red_1][kolona_1][5])
+                    #Крајње (жељено) поље
                     target_prilaz_2=robomath.Pose(pjesak_prilaz[red_2][kolona_2][0],pjesak_prilaz[red_2][kolona_2][1],pjesak_prilaz[red_2][kolona_2][2],pjesak_prilaz[red_2][kolona_2][3],pjesak_prilaz[red_2][kolona_2][4],pjesak_prilaz[red_2][kolona_2][5])
                     target_hvatanje_2=robomath.Pose(pjesak_hvatanje[red_2][kolona_2][0],pjesak_hvatanje[red_2][kolona_2][1],pjesak_hvatanje[red_2][kolona_2][2],pjesak_hvatanje[red_2][kolona_2][3],pjesak_hvatanje[red_2][kolona_2][4],pjesak_hvatanje[red_2][kolona_2][5])
+                    '''Дио кода којим се остварује прилаз и узимање поједеног пјешака, као и његово одлагање. 
+                    Након одлагања пјешака, врши се помјерање пјешака са којим је извршено узимање.'''
                     robot.MoveL(target_prilaz_2)
                     otvorena_hvataljka_51.RunProgram()
                     while otvorena_hvataljka_51.Busy():
@@ -455,6 +493,7 @@ class Igra:
                     zatvorena_hvataljka_10_5.RunProgram()
                     while zatvorena_hvataljka_10_5.Busy():
                         tm.sleep(0.1)
+                    #Узимање и уклањање поједеног пјешака са шаховске табле  
                     pojedena_figura=hvataljka.AttachClosest()
                     robot.MoveL(target_prilaz_2)
                     robot.MoveL(target_ostavljanje_figure)
@@ -464,9 +503,9 @@ class Igra:
                     while otvorena_hvataljka_51.Busy():
                         tm.sleep(0.1)
                     robot.MoveL(target_ostavljanje_figure)
-                    #----------------------------------------------------------->ostavljanje pojedene figure
+                    #Везивање поједеног пјешака за координатни систем поједених фигура
                     self.ostavljanje_pojedenih_figura(figura_napadnuta,pojedena_figura,koordinatni_sistem_odlaganje_bijele, koordinatni_sistem_odlaganje_crne)
-                    #------------------------------------------------------------------
+                    #Помјерање селектованог пјешака након што је уклоњен поједени пјешак
                     robot.MoveL(target_prilaz_1)
                     robot.MoveL(target_hvatanje_1)
                     zatvorena_hvataljka_10_5.RunProgram()
@@ -482,11 +521,15 @@ class Igra:
                         tm.sleep(0.1)
                     robot.MoveL(target_prilaz_2)
                     robot.MoveL(target_pocetna)
-                else:#----------------------------------->Slucaj kad teska figura uzima pjesaka (2)
+                #Случај када остале фигуре узимају пјешака
+                else:
+                    #Таргети за прилаз и хватање фигуре (почетно поље)
                     target_prilaz_1=robomath.Pose(figure_prilaz[red_1][kolona_1][0],figure_prilaz[red_1][kolona_1][1],figure_prilaz[red_1][kolona_1][2],figure_prilaz[red_1][kolona_1][3],figure_prilaz[red_1][kolona_1][4],figure_prilaz[red_1][kolona_1][5])
                     target_hvatanje_1=robomath.Pose(figure_hvatanje[red_1][kolona_1][0],figure_hvatanje[red_1][kolona_1][1],figure_hvatanje[red_1][kolona_1][2],figure_hvatanje[red_1][kolona_1][3],figure_hvatanje[red_1][kolona_1][4],figure_hvatanje[red_1][kolona_1][5])
+                    #Таргети за прилаз и хватање поједеног пјешака
                     target_prilaz_2=robomath.Pose(pjesak_prilaz[red_2][kolona_2][0],pjesak_prilaz[red_2][kolona_2][1],pjesak_prilaz[red_2][kolona_2][2],pjesak_prilaz[red_2][kolona_2][3],pjesak_prilaz[red_2][kolona_2][4],pjesak_prilaz[red_2][kolona_2][5])
                     target_hvatanje_2=robomath.Pose(pjesak_hvatanje[red_2][kolona_2][0],pjesak_hvatanje[red_2][kolona_2][1],pjesak_hvatanje[red_2][kolona_2][2],pjesak_hvatanje[red_2][kolona_2][3],pjesak_hvatanje[red_2][kolona_2][4],pjesak_hvatanje[red_2][kolona_2][5])
+                    #Таргети за прилаз и хватање фигуре (крајње поље)
                     target_prilaz_1_2=robomath.Pose(figure_prilaz[red_2][kolona_2][0],figure_prilaz[red_2][kolona_2][1],figure_prilaz[red_2][kolona_2][2],figure_prilaz[red_2][kolona_2][3],figure_prilaz[red_2][kolona_2][4],figure_prilaz[red_2][kolona_2][5])
                     target_hvatanje_1_2=robomath.Pose(figure_hvatanje[red_2][kolona_2][0],figure_hvatanje[red_2][kolona_2][1],figure_hvatanje[red_2][kolona_2][2],figure_hvatanje[red_2][kolona_2][3],figure_hvatanje[red_2][kolona_2][4],figure_hvatanje[red_2][kolona_2][5])
                     robot.MoveL(target_prilaz_2)
@@ -497,6 +540,7 @@ class Igra:
                     zatvorena_hvataljka_10_5.RunProgram()
                     while zatvorena_hvataljka_10_5.Busy():
                         tm.sleep(0.1)
+                    #Узимање и уклањање поједеног пјешака са шаховске табле
                     pojedena_figura=hvataljka.AttachClosest()
                     robot.MoveL(target_prilaz_2)
                     robot.MoveL(target_ostavljanje_figure)
@@ -506,9 +550,8 @@ class Igra:
                     while otvorena_hvataljka_51.Busy():
                         tm.sleep(0.1)
                     robot.MoveL(target_ostavljanje_figure)
-                    #----------------------------------------------------------->ostavljanje pojedene figure
                     self.ostavljanje_pojedenih_figura(figura_napadnuta,pojedena_figura,koordinatni_sistem_odlaganje_bijele, koordinatni_sistem_odlaganje_crne)
-                    #----------------------------------------------------------------------
+                    #Помјерање фигуре са почетног на жељено поље
                     robot.MoveL(target_prilaz_1)
                     otvorena_hvataljka_figure.RunProgram()
                     while otvorena_hvataljka_figure.Busy():
@@ -536,12 +579,16 @@ class Igra:
                         tm.sleep(0.1)
                     robot.MoveL(target_prilaz_1_2)
                     robot.MoveL(target_pocetna)
+            #Случај када пјешак узима неку од тешких фигура
             else:
-                 if figura and figura.piece_type==sah.PAWN:#----------------------------------->Slucaj kad pjesak uzima tesku figuru (3)
+                 if figura and figura.piece_type==sah.PAWN:
+                    #Таргети за прилаз и хватање пјешака (почетно поље)
                     target_prilaz_1=robomath.Pose(pjesak_prilaz[red_1][kolona_1][0],pjesak_prilaz[red_1][kolona_1][1],pjesak_prilaz[red_1][kolona_1][2],pjesak_prilaz[red_1][kolona_1][3],pjesak_prilaz[red_1][kolona_1][4],pjesak_prilaz[red_1][kolona_1][5])
                     target_hvatanje_1=robomath.Pose(pjesak_hvatanje[red_1][kolona_1][0],pjesak_hvatanje[red_1][kolona_1][1],pjesak_hvatanje[red_1][kolona_1][2],pjesak_hvatanje[red_1][kolona_1][3],pjesak_hvatanje[red_1][kolona_1][4],pjesak_hvatanje[red_1][kolona_1][5])
+                    #Таргети за прилаз и испуштање пјешака (крајње поље)
                     target_prilaz_2=robomath.Pose(pjesak_prilaz[red_2][kolona_2][0],pjesak_prilaz[red_2][kolona_2][1],pjesak_prilaz[red_2][kolona_2][2],pjesak_prilaz[red_2][kolona_2][3],pjesak_prilaz[red_2][kolona_2][4],pjesak_prilaz[red_2][kolona_2][5])
                     target_hvatanje_2=robomath.Pose(pjesak_hvatanje[red_2][kolona_2][0],pjesak_hvatanje[red_2][kolona_2][1],pjesak_hvatanje[red_2][kolona_2][2],pjesak_hvatanje[red_2][kolona_2][3],pjesak_hvatanje[red_2][kolona_2][4],pjesak_hvatanje[red_2][kolona_2][5])
+                    #Таргети за прилаз и хватање поједене фигуре
                     target_prilaz_1_2=robomath.Pose(figure_prilaz[red_2][kolona_2][0],figure_prilaz[red_2][kolona_2][1],figure_prilaz[red_2][kolona_2][2],figure_prilaz[red_2][kolona_2][3],figure_prilaz[red_2][kolona_2][4],figure_prilaz[red_2][kolona_2][5])
                     target_hvatanje_1_2=robomath.Pose(figure_hvatanje[red_2][kolona_2][0],figure_hvatanje[red_2][kolona_2][1],figure_hvatanje[red_2][kolona_2][2],figure_hvatanje[red_2][kolona_2][3],figure_hvatanje[red_2][kolona_2][4],figure_hvatanje[red_2][kolona_2][5])
                     robot.MoveL(target_prilaz_1_2)
@@ -566,10 +613,7 @@ class Igra:
                     while otvorena_hvataljka_figure.Busy():
                         tm.sleep(0.1)
                     robot.MoveL(target_ostavljanje_figure)
-                    #----------------------------------------------------------->ostavljanje pojedene figure
                     self.ostavljanje_pojedenih_figura(figura_napadnuta,pojedena_figura,koordinatni_sistem_odlaganje_bijele, koordinatni_sistem_odlaganje_crne)
-                    #----------------------------------------------------------------------
-                    #------>dio isti ko i za normalno kretanje pjesaka
                     robot.MoveL(target_prilaz_1)
                     otvorena_hvataljka_51.RunProgram()
                     while otvorena_hvataljka_51.Busy():
@@ -588,9 +632,12 @@ class Igra:
                         tm.sleep(0.1)
                     robot.MoveL(target_prilaz_2)
                     robot.MoveL(target_pocetna)
-                 else:#----------------------------------->Slucaj kad figura uzima figuru (4)
+                 #Случај када фигура узима фигуру (све фигуре осим пјешака)
+                 else:
+                    #Таргети за прилаз и узимање фигуре (почетно поље)
                     target_prilaz_1=robomath.Pose(figure_prilaz[red_1][kolona_1][0],figure_prilaz[red_1][kolona_1][1],figure_prilaz[red_1][kolona_1][2],figure_prilaz[red_1][kolona_1][3],figure_prilaz[red_1][kolona_1][4],figure_prilaz[red_1][kolona_1][5])
                     target_hvatanje_1=robomath.Pose(figure_hvatanje[red_1][kolona_1][0],figure_hvatanje[red_1][kolona_1][1],figure_hvatanje[red_1][kolona_1][2],figure_hvatanje[red_1][kolona_1][3],figure_hvatanje[red_1][kolona_1][4],figure_hvatanje[red_1][kolona_1][5])
+                    #Таргети за прилаз и узимање фигуре (крајње поље)
                     target_prilaz_2=robomath.Pose(figure_prilaz[red_2][kolona_2][0],figure_prilaz[red_2][kolona_2][1],figure_prilaz[red_2][kolona_2][2],figure_prilaz[red_2][kolona_2][3],figure_prilaz[red_2][kolona_2][4],figure_prilaz[red_2][kolona_2][5])
                     target_hvatanje_2=robomath.Pose(figure_hvatanje[red_2][kolona_2][0],figure_hvatanje[red_2][kolona_2][1],figure_hvatanje[red_2][kolona_2][2],figure_hvatanje[red_2][kolona_2][3],figure_hvatanje[red_2][kolona_2][4],figure_hvatanje[red_2][kolona_2][5])
                     robot.MoveL(target_prilaz_2)
@@ -615,9 +662,7 @@ class Igra:
                     while otvorena_hvataljka_figure.Busy():
                         tm.sleep(0.1)
                     robot.MoveL(target_ostavljanje_figure)
-                    #----------------------------------------------------------->ostavljanje pojedene figure
                     self.ostavljanje_pojedenih_figura(figura_napadnuta,pojedena_figura,koordinatni_sistem_odlaganje_bijele, koordinatni_sistem_odlaganje_crne)
-                    #----------------------------------------------------------------------
                     robot.MoveL(target_prilaz_1)
                     robot.MoveL(target_hvatanje_1)
                     if figura.piece_type==sah.ROOK or figura.piece_type==sah.KING or figura.piece_type==sah.QUEEN:
@@ -642,7 +687,11 @@ class Igra:
                         tm.sleep(0.1)
                     robot.MoveL(target_prilaz_2)
                     robot.MoveL(target_pocetna)
-    def promocijaPjesaka(self,red_1,kolona_1,red_2,kolona_2,figura_krajnja,figura_napadnuta):#Pomjeriti targete
+#---------------------------------------------------------------------------------------------------------------
+'''Функција promocijaPjesaka ()има улогу да изврши промоцију пјешака у жељену фигуру на шаховској плочи у софтверу RoboDK. 
+   Аргументи ове функције су: ред и колона селектованог и жељеног шаховског поља, фигура која се промовише (figura_krajnja) и 
+   нападнута фигура (у случају да пјешак узима противничку фигуру приликом промоције).'''           
+    def promocijaPjesaka(self,red_1,kolona_1,red_2,kolona_2,figura_krajnja,figura_napadnuta):
         global brojac_pojedenih_bijele
         global brojac_pojedenih_crne
         target_pocetna=robomath.Pose(170,85,130,180,0,-90)
@@ -734,16 +783,21 @@ class Igra:
                 lista_prilaza_5.append(lista)
             prilaz_slobodno_kretanja.append(lista_prilaza_5)
             lista_prilaza_5=[]
-         #----------------------------------------------------------->Promocija na prazno polje
+        #Таргети за прилаз и хватање селектованог пјешака са почетног поља
         target_prilaz_1=robomath.Pose(pjesak_prilaz[red_1][kolona_1][0],pjesak_prilaz[red_1][kolona_1][1],pjesak_prilaz[red_1][kolona_1][2],pjesak_prilaz[red_1][kolona_1][3],pjesak_prilaz[red_1][kolona_1][4],pjesak_prilaz[red_1][kolona_1][5])
         target_hvatanje_1=robomath.Pose(pjesak_hvatanje[red_1][kolona_1][0],pjesak_hvatanje[red_1][kolona_1][1],pjesak_hvatanje[red_1][kolona_1][2],pjesak_hvatanje[red_1][kolona_1][3],pjesak_hvatanje[red_1][kolona_1][4],pjesak_hvatanje[red_1][kolona_1][5])
+        #Таргети за прилаз и испуштање селектованог пјешака на жељено поље
         target_prilaz_2=robomath.Pose(pjesak_prilaz[red_2][kolona_2][0],pjesak_prilaz[red_2][kolona_2][1],pjesak_prilaz[red_2][kolona_2][2],pjesak_prilaz[red_2][kolona_2][3],pjesak_prilaz[red_2][kolona_2][4],pjesak_prilaz[red_2][kolona_2][5])
         target_hvatanje_2=robomath.Pose(pjesak_hvatanje[red_2][kolona_2][0],pjesak_hvatanje[red_2][kolona_2][1],pjesak_hvatanje[red_2][kolona_2][2],pjesak_hvatanje[red_2][kolona_2][3],pjesak_hvatanje[red_2][kolona_2][4],pjesak_hvatanje[red_2][kolona_2][5])
+        #Таргети за прилаз и узимање поједене фигуре, ако она постоји
         target_prilaz1_2=robomath.Pose(figure_prilaz[red_2][kolona_2][0],figure_prilaz[red_2][kolona_2][1],figure_prilaz[red_2][kolona_2][2],figure_prilaz[red_2][kolona_2][3],figure_prilaz[red_2][kolona_2][4],figure_prilaz[red_2][kolona_2][5])
         target_hvatanje1_2=robomath.Pose(figure_hvatanje[red_2][kolona_2][0],figure_hvatanje[red_2][kolona_2][1],figure_hvatanje[red_2][kolona_2][2],figure_hvatanje[red_2][kolona_2][3],figure_hvatanje[red_2][kolona_2][4],figure_hvatanje[red_2][kolona_2][5])
+        #Таргети за ниже подизање пјешака
         target_mali_prilaz_1=robomath.Pose(prilaz_slobodno_kretanja[red_1][kolona_1][0],prilaz_slobodno_kretanja[red_1][kolona_1][1],prilaz_slobodno_kretanja[red_1][kolona_1][2],prilaz_slobodno_kretanja[red_1][kolona_1][3],prilaz_slobodno_kretanja[red_1][kolona_1][4],prilaz_slobodno_kretanja[red_1][kolona_1][5])
         target_mali_prilaz_2=robomath.Pose(prilaz_slobodno_kretanja[red_2][kolona_2][0],prilaz_slobodno_kretanja[red_2][kolona_2][1],prilaz_slobodno_kretanja[red_2][kolona_2][2],prilaz_slobodno_kretanja[red_2][kolona_2][3],prilaz_slobodno_kretanja[red_2][kolona_2][4],prilaz_slobodno_kretanja[red_2][kolona_2][5])
+        #Случај када је узета противничка фигура током промоцје пјешака
         if figura_napadnuta is not None:
+            #Узимање и одлагање противничке фигуре са шаховске табле
             robot.MoveL(target_prilaz1_2)
             otvorena_hvataljka_figure.RunProgram()
             while otvorena_hvataljka_figure.Busy():
@@ -767,6 +821,8 @@ class Igra:
                 tm.sleep(0.1)
             robot.MoveL(target_ostavljanje_figure)
             self.ostavljanje_pojedenih_figura(figura_napadnuta,pojedena_figura,koordinatni_sistem_odlaganje_bijele, koordinatni_sistem_odlaganje_crne)
+        '''Након одлагања поједене фигуре, врши се помјерање пјешака на поље промоције, а затим се тај пјешак уклања
+        са шаховске табле (овај дио кода се односи и на промоцију пјешака на слободно поље).'''
         robot.MoveL(target_prilaz_1)
         otvorena_hvataljka_51.RunProgram()
         while otvorena_hvataljka_51.Busy():
@@ -791,7 +847,7 @@ class Igra:
         while otvorena_hvataljka_51.Busy():
             tm.sleep(0.1)
         robot.MoveL(target_ostavljanje_figure)
-                #----------------------------------------------------------->ostavljanje pjesaka poslije promocije
+        #Одлагање пјешака послије промоције
         if self.sahovska_tabla.turn==sah.BLACK:
             pojedena_figura.setParent(koordinatni_sistem_odlaganje_bijele)
             translacija_x=25*brojac_pojedenih_bijele
@@ -812,8 +868,9 @@ class Igra:
                                      [0, 1, 0, 1], 
                                      [0, 0, 0, 1]])
             pojedena_figura.setPose(matrica_translacije)
-              #---------------------------------------------------------------------->provjeriti koja je figura promocije, otici do nje i vratiti se do selektovanog polja u zavisnosti od polozoja 2
-        if figura_krajnja.piece_type==sah.QUEEN and not figura_krajnja.color:# slucaj kada se promovise crna dama (pjesak ide na slobodno polje)
+        #Провјера у коју фигуру се промовише пјешака (у софтверу RoboDK су креирне додатне фигуре за промоцију)
+        #Промоција пјешака у црну даму
+        if figura_krajnja.piece_type==sah.QUEEN and not figura_krajnja.color:
             robot.MoveL(robomath.Pose(292.5,290,110,180,0,-90))
             otvorena_hvataljka_figure.RunProgram()
             while otvorena_hvataljka_figure.Busy():
@@ -832,7 +889,8 @@ class Igra:
                     tm.sleep(0.1)
             robot.MoveL(target_prilaz1_2)
             robot.MoveL(target_pocetna)
-        elif figura_krajnja.piece_type==sah.QUEEN and figura_krajnja.color: # slucaj kada se promovise bijela dama (pjesak ide na slobodno polje)
+        #Промоција пјешака у бијелу даму
+        elif figura_krajnja.piece_type==sah.QUEEN and figura_krajnja.color:
             robot.MoveL(robomath.Pose(152.5,290,110,180,0,-90))
             otvorena_hvataljka_figure.RunProgram()
             while otvorena_hvataljka_figure.Busy():
@@ -851,7 +909,8 @@ class Igra:
                     tm.sleep(0.1)
             robot.MoveL(target_prilaz1_2)
             robot.MoveL(target_pocetna)
-        elif figura_krajnja.piece_type==sah.ROOK and not figura_krajnja.color: # slucaj kada se promovise crni top (pjesak ide na slobodno polje)
+        #Промоција пјешака у црног топа
+        elif figura_krajnja.piece_type==sah.ROOK and not figura_krajnja.color:
             robot.MoveL(robomath.Pose(187.5,290,110,180,0,-90))
             otvorena_hvataljka_figure.RunProgram()
             while otvorena_hvataljka_figure.Busy():
@@ -870,7 +929,8 @@ class Igra:
                     tm.sleep(0.1)
             robot.MoveL(target_prilaz1_2)
             robot.MoveL(target_pocetna)
-        elif figura_krajnja.piece_type==sah.ROOK and figura_krajnja.color: # slucaj kada se promovise bijeli top (pjesak ide na slobodno polje)
+        #Промоција пјешака у бијелог топа
+        elif figura_krajnja.piece_type==sah.ROOK and figura_krajnja.color:
             robot.MoveL(robomath.Pose(47.5,290,110,180,0,-90))
             otvorena_hvataljka_figure.RunProgram()
             while otvorena_hvataljka_figure.Busy():
@@ -889,7 +949,8 @@ class Igra:
                     tm.sleep(0.1)
             robot.MoveL(target_prilaz1_2)
             robot.MoveL(target_pocetna)
-        elif figura_krajnja.piece_type==sah.BISHOP and not figura_krajnja.color: # slucaj kada se promovise crni lovac (pjesak ide na slobodno polje)
+        #Промоција пјешака у црног ловца
+        elif figura_krajnja.piece_type==sah.BISHOP and not figura_krajnja.color:
             robot.MoveL(robomath.Pose(257.5,290,110,180,0,-90))
             otvorena_hvataljka_figure.RunProgram()
             while otvorena_hvataljka_figure.Busy():
@@ -908,7 +969,8 @@ class Igra:
                     tm.sleep(0.1)
             robot.MoveL(target_prilaz1_2)
             robot.MoveL(target_pocetna)
-        elif figura_krajnja.piece_type==sah.BISHOP and figura_krajnja.color: # slucaj kada se promovise bijeli lovac (pjesak ide na slobodno polje)
+        #Промоција пјешака у бијелог ловца
+        elif figura_krajnja.piece_type==sah.BISHOP and figura_krajnja.color:
             robot.MoveL(robomath.Pose(117.5,290,110,180,0,-90))
             otvorena_hvataljka_figure.RunProgram()
             while otvorena_hvataljka_figure.Busy():
@@ -927,7 +989,8 @@ class Igra:
                     tm.sleep(0.1)
             robot.MoveL(target_prilaz1_2)
             robot.MoveL(target_pocetna)
-        elif figura_krajnja.piece_type==sah.KNIGHT and not figura_krajnja.color: # slucaj kada se promovise crni konj (pjesak ide na slobodno polje)
+        #Промоција пјешака у црног скакача
+        elif figura_krajnja.piece_type==sah.KNIGHT and not figura_krajnja.color:
             robot.MoveL(robomath.Pose(222.5,290,110,180,0,-90))
             otvorena_hvataljka_figure.RunProgram()
             while otvorena_hvataljka_figure.Busy():
@@ -946,7 +1009,8 @@ class Igra:
                     tm.sleep(0.1)
             robot.MoveL(target_prilaz1_2)
             robot.MoveL(target_pocetna)
-        elif figura_krajnja.piece_type==sah.KNIGHT and figura_krajnja.color: # slucaj kada se promovise bijeli konj (pjesak ide na slobodno polje)
+        #Промоција пјешака у бијелог скакача
+        elif figura_krajnja.piece_type==sah.KNIGHT and figura_krajnja.color:
             robot.MoveL(robomath.Pose(82.5,290,110,180,0,-90))
             otvorena_hvataljka_figure.RunProgram()
             while otvorena_hvataljka_figure.Busy():
@@ -965,6 +1029,8 @@ class Igra:
                     tm.sleep(0.1)
             robot.MoveL(target_prilaz1_2)
             robot.MoveL(target_pocetna)
+#---------------------------------------------------------------------------------------------------------------
+#Функција које омогућава реализацију шаховског потеза “en passant”
     def en_passant(self,red_1,kolona_1,red_2,kolona_2):
         global brojac_pojedenih_bijele
         global brojac_pojedenih_crne
@@ -1037,7 +1103,6 @@ class Igra:
         while otvorena_hvataljka_51.Busy():
             tm.sleep(0.1)
         robot.MoveL(target_ostavljanje_figure)
-        #----
         if self.sahovska_tabla.turn:
             pojedena_figura.setParent(koordinatni_sistem_odlaganje_bijele)
             translacija_x=25*brojac_pojedenih_bijele
@@ -1058,7 +1123,6 @@ class Igra:
                                      [0, 1, 0, 1], 
                                      [0, 0, 0, 1]])
             pojedena_figura.setPose(matrica_translacije)
-        #----
         robot.MoveL(target_prilaz_1)
         otvorena_hvataljka_51.RunProgram()
         while otvorena_hvataljka_51.Busy():
@@ -1076,15 +1140,22 @@ class Igra:
         while otvorena_hvataljka_51.Busy():
             tm.sleep(0.1)
         robot.MoveL(target_prilaz_2)
-        robot.MoveL(target_pocetna)   
+        robot.MoveL(target_pocetna)
+#---------------------------------------------------------------------------------------------------------------
+'''Функција којa омогућава потез играча oдносно кориснички унос помоћу периферног уређаја (миша).
+   Такође, унутар ове функције се врше позиви функција за реализацију шаховског потеза у симулацији у зависности од његовог типа.'''
     def potezIgraca(self):
         tip_rohade=""
         zeljeno_polje = None
+        #Бесконачна петља (омогућава унос све док се не дође до легалног потеза)
         while True:
+            #Провјера корисничког уноса
             for event in PY.event.get():
                 if event.type == PY.QUIT:
                     PY.quit()
                     pocetna_pozicija=RDK.Item("pocetna_pozicija",robolink.ITEM_TYPE_PROGRAM)
+                    '''Повратак елеменатау почетни положај на радној станици у софтверу RoboDK приликом 
+                    затвварања графичког прозора (pocetna_pozicija.RunProgram())'''
                     pocetna_pozicija.RunProgram()
                     return
                 elif event.type == PY.MOUSEBUTTONDOWN:
@@ -1097,45 +1168,49 @@ class Igra:
                             self.prikaz_legalnih_poteza(zeljeno_polje)
                             PY.display.update()
                     else:
+                        #Креирање шаховског потеза на основу индекса почетног и крајњег поља (класа chess.Move())
                         potez = sah.Move(zeljeno_polje, selektovano_polje)
                         figura=self.sahovska_tabla.piece_at(zeljeno_polje)
                         figura_uzimanje=self.sahovska_tabla.piece_at(selektovano_polje)
+                        #Рачунање редова и колона поља на основу његовог индекса
                         kolona_zeljeno = zeljeno_polje % 8
                         red_zeljeno = zeljeno_polje // 8
                         kolona_selektovano = selektovano_polje % 8
                         red_selektovano = selektovano_polje // 8
                         
-                        #Promocija pjesaka
+                        #Тип потеза (промоција)
                         if (figura and figura.piece_type==sah.PAWN and selektovano_polje//8==7 and \
                             self.sahovska_tabla.turn==sah.WHITE and zeljeno_polje//8==6) or (figura and \
                             figura.piece_type==sah.PAWN and selektovano_polje//8==0 and \
                             self.sahovska_tabla.turn==sah.BLACK and zeljeno_polje//8==1):
                             print("Promocija pjesaka!")
+                            #Позив функције promocija_pjesaka()
                             self.promocija_pjesaka(potez)
                             return
-                        
-                        #En passant
+                        #Тип потеза (en passant)
                         elif potez in self.sahovska_tabla.legal_moves and self.sahovska_tabla.is_en_passant(potez):
                             self.sahovska_tabla.push(potez)
                             print(f"Igrac je odigrao potez: {potez}")
                             self.crtanje_table()
                             PY.display.update()
+                            #Позив функције en_passant()
                             self.en_passant(red_zeljeno,kolona_zeljeno,red_selektovano,kolona_selektovano)
                             return
-                        #Rohada
+                        #Тип потеза (рохада)
                         elif potez in self.sahovska_tabla.legal_moves and self.sahovska_tabla.is_castling(potez):
                             self.sahovska_tabla.push(potez)
                             print(f"Igrac je odigrao potez: {potez}")
                             self.crtanje_table()
                             PY.display.update()
+                            #Провјера типа рохаде
                             if potez.to_square==sah.G1 or potez.to_square==sah.G8:
                                 tip_rohade="mala"
                             else:
                                 tip_rohade="velika"
+                            #Позив функције rohada()
                             self.rohada(red_zeljeno,kolona_zeljeno,red_selektovano,kolona_selektovano,tip_rohade)
                             return
-                        
-                        #Pomjeranje figure na slobodno polje ili uzimanje figure
+                        #Тип потеза (помјерање фигуре на слободно поља или узимање противничке фигуре)
                         elif potez in self.sahovska_tabla.legal_moves:
                             self.sahovska_tabla.push(potez)
                             print(f"Igrac je odigrao potez: {potez}")
@@ -1143,8 +1218,7 @@ class Igra:
                             PY.display.update()
                             self.pomjeranje_figura(red_zeljeno,kolona_zeljeno,red_selektovano,kolona_selektovano,figura,figura_uzimanje)
                             return
-                        
-                        #Promjena pocetne (selektovane) figure
+                        #Замјена почетне (селектоване) фигуре
                         elif self.sahovska_tabla.color_at(selektovano_polje)==self.sahovska_tabla.turn:
                             zeljeno_polje=selektovano_polje
                             self.crtanje_table()
@@ -1153,7 +1227,9 @@ class Igra:
                         #Nelegalan potez
                         else:
                             print("Nelegalan potez. Pokušajte ponovo.")
-    def rohada(self,red_1,kolona_1,red_2,kolona_2,tip_rohade):#Pomjeriti targete na gore
+#---------------------------------------------------------------------------------------------------------------
+#Функција rohada() обезбјеђује релизацију мале и велике рохаде у симулацији
+    def rohada(self,red_1,kolona_1,red_2,kolona_2,tip_rohade):
         robot=RDK.Item("robot")
         hvataljka=RDK.Item("Tool_1")
         ispustanje_figure=RDK.Item("ispustanje_figure",robolink.ITEM_TYPE_PROGRAM)
@@ -1191,35 +1267,35 @@ class Igra:
             figure_hvatanje.append(lista_prilaza_4)
             lista_prilaza_4=[]
             
-        #Prilazi i hvatanja za bijeli top(mala rohada)
+        #Таргети за прилаз и хватање бијлог топа (мала рохада)
         #---------------------------------------------
         top_bijeli_mala_hvatanje_1=robomath.Pose(figure_hvatanje[0][7][0],figure_hvatanje[0][7][1],figure_hvatanje[0][7][2],figure_hvatanje[0][7][3],figure_hvatanje[0][7][4],figure_hvatanje[0][7][5])
         top_bijeli_mala_prilaz_1=robomath.Pose(figure_prilaz[0][7][0],figure_prilaz[0][7][1],figure_prilaz[0][7][2],figure_prilaz[0][7][3],figure_prilaz[0][7][4],figure_prilaz[0][7][5])
         top_bijeli_mala_hvatanje_2=robomath.Pose(figure_hvatanje[0][5][0],figure_hvatanje[0][5][1],figure_hvatanje[0][5][2],figure_hvatanje[0][5][3],figure_hvatanje[0][5][4],figure_hvatanje[0][5][5])
         top_bijeli_mala_prilaz_2=robomath.Pose(figure_prilaz[0][5][0],figure_prilaz[0][5][1],figure_prilaz[0][5][2],figure_prilaz[0][5][3],figure_prilaz[0][5][4],figure_prilaz[0][5][5])
         
-        #Prilazi i hvatanja za bijeli top(velika rohada)
+        #Таргети за прилаз и хватање бијлог топа (велика рохада)
         #---------------------------------------------
         top_bijeli_velika_hvatanje_1_1=robomath.Pose(figure_hvatanje[0][0][0],figure_hvatanje[0][0][1],figure_hvatanje[0][0][2],figure_hvatanje[0][0][3],figure_hvatanje[0][0][4],figure_hvatanje[0][0][5])
         top_bijeli_velika_prilaz_1_1=robomath.Pose(figure_prilaz[0][0][0],figure_prilaz[0][0][1],figure_prilaz[0][0][2],figure_prilaz[0][0][3],figure_prilaz[0][0][4],figure_prilaz[0][0][5])
         top_bijeli_velika_hvatanje_2_2=robomath.Pose(figure_hvatanje[0][3][0],figure_hvatanje[0][3][1],figure_hvatanje[0][3][2],figure_hvatanje[0][3][3],figure_hvatanje[0][3][4],figure_hvatanje[0][3][5])
         top_bijeli_velika_prilaz_2_2=robomath.Pose(figure_prilaz[0][3][0],figure_prilaz[0][3][1],figure_prilaz[0][3][2],figure_prilaz[0][3][3],figure_prilaz[0][3][4],figure_prilaz[0][3][5])
         
-        #Prilazi i hvatanja za crni top(mala rohada)
+        #Таргети за прилаз и хватање црног топа (мала рохада)
         #---------------------------------------------
         top_crni_mala_hvatanje_1=robomath.Pose(figure_hvatanje[7][7][0],figure_hvatanje[7][7][1],figure_hvatanje[7][7][2],figure_hvatanje[7][7][3],figure_hvatanje[7][7][4],figure_hvatanje[7][7][5])
         top_crni_mala_prilaz_1=robomath.Pose(figure_prilaz[7][7][0],figure_prilaz[7][7][1],figure_prilaz[7][7][2],figure_prilaz[7][7][3],figure_prilaz[7][7][4],figure_prilaz[7][7][5])
         top_crni_mala_hvatanje_2=robomath.Pose(figure_hvatanje[7][5][0],figure_hvatanje[7][5][1],figure_hvatanje[7][5][2],figure_hvatanje[7][5][3],figure_hvatanje[7][5][4],figure_hvatanje[7][5][5])
         top_crni_mala_prilaz_2=robomath.Pose(figure_prilaz[7][5][0],figure_prilaz[7][5][1],figure_prilaz[7][5][2],figure_prilaz[7][5][3],figure_prilaz[7][5][4],figure_prilaz[7][5][5])
         
-        #Prilazi i hvatanja za crni top(velika rohada)
+        #Таргети за прилаз и хватање црног топа (велика рохада)
         #---------------------------------------------
         top_crni_velika_hvatanje_1_1=robomath.Pose(figure_hvatanje[7][0][0],figure_hvatanje[7][0][1],figure_hvatanje[7][0][2],figure_hvatanje[7][0][3],figure_hvatanje[7][0][4],figure_hvatanje[7][0][5])
         top_crni_velika_prilaz_1_1=robomath.Pose(figure_prilaz[7][0][0],figure_prilaz[7][0][1],figure_prilaz[7][0][2],figure_prilaz[7][0][3],figure_prilaz[7][0][4],figure_prilaz[7][0][5])
         top_crni_velika_hvatanje_2_2=robomath.Pose(figure_hvatanje[7][3][0],figure_hvatanje[7][3][1],figure_hvatanje[7][3][2],figure_hvatanje[7][3][3],figure_hvatanje[7][3][4],figure_hvatanje[7][3][5])
         top_crni_velika_prilaz_2_2=robomath.Pose(figure_prilaz[7][3][0],figure_prilaz[7][3][1],figure_prilaz[7][3][2],figure_prilaz[7][3][3],figure_prilaz[7][3][4],figure_prilaz[7][3][5])
-        #----------------------------
-        #Prilazi i hvatanja za kralja
+        #---------------------------------
+        #Таргети за прилаз и хватање краља
         target_prilaz_1=robomath.Pose(figure_prilaz[red_1][kolona_1][0],figure_prilaz[red_1][kolona_1][1],figure_prilaz[red_1][kolona_1][2],figure_prilaz[red_1][kolona_1][3],figure_prilaz[red_1][kolona_1][4],figure_prilaz[red_1][kolona_1][5])
         target_hvatanje_1=robomath.Pose(figure_hvatanje[red_1][kolona_1][0],figure_hvatanje[red_1][kolona_1][1],figure_hvatanje[red_1][kolona_1][2],figure_hvatanje[red_1][kolona_1][3],figure_hvatanje[red_1][kolona_1][4],figure_hvatanje[red_1][kolona_1][5])
         target_prilaz_2=robomath.Pose(figure_prilaz[red_2][kolona_2][0],figure_prilaz[red_2][kolona_2][1],figure_prilaz[red_2][kolona_2][2],figure_prilaz[red_2][kolona_2][3],figure_prilaz[red_2][kolona_2][4],figure_prilaz[red_2][kolona_2][5])
@@ -1242,6 +1318,7 @@ class Igra:
                 while otvorena_hvataljka_figure.Busy():
                     tm.sleep(0.1)
                 robot.MoveL(target_prilaz_2)
+                #Мала рохада (бијеле фигуре)
                 if tip_rohade=="mala":
                     robot.MoveL(top_bijeli_mala_prilaz_1)
                     robot.MoveL(top_bijeli_mala_hvatanje_1)
@@ -1257,6 +1334,7 @@ class Igra:
                     while otvorena_hvataljka_figure.Busy():
                         tm.sleep(0.1)
                     robot.MoveL(top_bijeli_mala_prilaz_2)
+                #Велика рохада (бијеле фигуре)
                 else:
                     robot.MoveL(top_bijeli_velika_prilaz_1_1)
                     robot.MoveL(top_bijeli_velika_hvatanje_1_1)
@@ -1291,6 +1369,7 @@ class Igra:
                 while otvorena_hvataljka_figure.Busy():
                     tm.sleep(0.1)
                 robot.MoveL(target_prilaz_2)
+                #Мала рохада (црне фигуре)
                 if tip_rohade=="mala":
                     robot.MoveL(top_crni_mala_prilaz_1)
                     robot.MoveL(top_crni_mala_hvatanje_1)
@@ -1306,6 +1385,7 @@ class Igra:
                     while otvorena_hvataljka_figure.Busy():
                         tm.sleep(0.1)
                     robot.MoveL(top_crni_mala_prilaz_2)
+                #Велика рохада (црне фигуре)
                 else:
                     robot.MoveL(top_crni_velika_prilaz_1_1)
                     robot.MoveL(top_crni_velika_hvatanje_1_1)
@@ -1321,10 +1401,13 @@ class Igra:
                     while otvorena_hvataljka_figure.Busy():
                         tm.sleep(0.1)
                     robot.MoveL(top_crni_velika_prilaz_2_2)
-                robot.MoveL(target_pocetna)    
+                robot.MoveL(target_pocetna)
+#---------------------------------------------------------------------------------------------------------------
+#Функција promocija_pjesaka()обезбјеђује избор типа фигуре у коју се пјешак промовише
     def promocija_pjesaka(self,potez):
         odabir_promocije=None
         while odabir_promocije not in [1,2,3,4]:
+            #Избор промоције
             odabir_promocije=int(input("Unesite zeljenu promociju,1(top),2(konj),3(lovac),4(dama):"))
         if odabir_promocije==1:
             nova_figura=sah.ROOK
@@ -1337,6 +1420,7 @@ class Igra:
         zapis_poteza=str(potez)
         polje_napadnuto=zapis_poteza[2:]
         figura_napadnuta=self.sahovska_tabla.piece_at(sah.SQUARES[sah.parse_square(polje_napadnuto)])
+        #Креирање шаховског потеза (као трећи аргумент конструктору класе chess.Move() просљеђује се изабрана фигура)
         promjena_figure=sah.Move(potez.from_square,potez.to_square,promotion=nova_figura)
         print(promjena_figure)
         self.sahovska_tabla.push(promjena_figure)
@@ -1348,15 +1432,20 @@ class Igra:
         figura_promocija=promocija[4]
         figura_pocetna=self.sahovska_tabla.piece_at(sah.SQUARES[sah.parse_square(pocetno_polje)])
         figura_krajnja=self.sahovska_tabla.piece_at(sah.SQUARES[sah.parse_square(krajnje_polje)])
+        #Конверзија алгебарског записа у индексе поља
         pocetno_polje_indeks=sah.parse_square(pocetno_polje)
         zeljeno_polje_indeks=sah.parse_square(krajnje_polje)
+        #Ред и колона почетног и крајњег поља
         kolona_zeljeno = pocetno_polje_indeks % 8
         red_zeljeno = pocetno_polje_indeks // 8
         kolona_selektovano = zeljeno_polje_indeks % 8
         red_selektovano = zeljeno_polje_indeks // 8
+        #Позив функције promocijaPjesaka()
         self.promocijaPjesaka(red_zeljeno,kolona_zeljeno,red_selektovano,kolona_selektovano,figura_krajnja,figura_napadnuta)
-        
+#---------------------------------------------------------------------------------------------------------------
+#Функција otvaranje() обезбјеђује потезе рачунара у фази шаховског отварања
     def otvaranje(self):
+        #Књиге за шаховска отварања
         pocetna_otvaranja_1=r"C:\Users\Korisnik\Desktop\M11.2_bin\M11.2.bin"
         pocetna_otvaranja_2=r"C:\Users\Korisnik\Desktop\Eman_bin.book\Eman.bin"
         pocetna_otvaranja_3=r"C:\Users\Korisnik\Desktop\AdrianOliva.bin.Book\AdrianOliva.bin"
@@ -1372,7 +1461,8 @@ class Igra:
             except Exception as e:
                 print(f"Greška prilikom učitavanja iz baze otvaranja: {e}")
         return None
-    
+#---------------------------------------------------------------------------------------------------------------
+#Функција ispisvanje_rezultat()служи да испише исход шаховске партије на графичком екрану
     def ispisivanje_rezultata(self,tekst):
         PY.font.init()
         font_teksta=PY.font.SysFont("Arial",35)
@@ -1385,7 +1475,8 @@ class Igra:
         PY.draw.rect(self.ploca,(255,0,0),pravougaonik)
         self.ploca.blit(pozadina_teksta,tekst_mjesto)
         PY.display.update()
-        
+#---------------------------------------------------------------------------------------------------------------
+#Функција за провјеру мата у наредом потезу   
     def mat_provjera(self):
         lista_legalnih=list(self.sahovska_tabla.legal_moves)
         for potez in lista_legalnih:
@@ -1395,11 +1486,15 @@ class Igra:
                 return potez
             self.sahovska_tabla.pop()
         return None
-    
+#---------------------------------------------------------------------------------------------------------------
+'''Функција potezRacunara()обезбјеђује функционално играње од стране рачунара. 
+   Аргументи који се просљеђују ово функцији су максимална дубина претраживања и боја фигура.'''
     def potezRacunara(self,max_dubina,boja_figura):
         racunar=sahEngine(self.sahovska_tabla,max_dubina,boja_figura)
+        #Случај када се потез добија помоћу функције mat_provjera()
         najbolji_potez=self.mat_provjera()
         if najbolji_potez!=None:
+            #Tип потеза (промоција)
             if najbolji_potez.promotion is not None:
                 pomocna=str(najbolji_potez)
                 pocetno_polje=pomocna[:2]
@@ -1432,6 +1527,7 @@ class Igra:
                 print(f"Potez računara je (minimax algoritam): {najbolji_potez}")
                 self.sahovska_tabla.push(najbolji_potez)
                 self.crtanje_table()
+                #Позив функције promocijaPjesaka()
                 self.promocijaPjesaka(red_zeljeno,kolona_zeljeno,red_selektovano,kolona_selektovano,figura_krajnja,figura_napadnuta)
             else:
                 pomocna=str(najbolji_potez)
@@ -1446,6 +1542,7 @@ class Igra:
                 kolona_selektovano = zeljeno_polje_indeks % 8
                 red_selektovano = zeljeno_polje_indeks // 8
                 print(f"Potez računara je (minimax algoritam): {najbolji_potez}")
+                #Tип потеза (рохада)
                 if  najbolji_potez in self.sahovska_tabla.legal_moves and self.sahovska_tabla.is_castling(najbolji_potez):
                     self.sahovska_tabla.push(najbolji_potez)
                     self.crtanje_table()
@@ -1453,7 +1550,9 @@ class Igra:
                         tip_rohade="mala"
                     else:
                         tip_rohade="velika"
+                    #Позив функције rohada()
                     self.rohada(red_zeljeno,kolona_zeljeno,red_selektovano,kolona_selektovano,tip_rohade)
+                #Тип потеза (еn_passant)
                 elif najbolji_potez in self.sahovska_tabla.legal_moves and self.sahovska_tabla.is_en_passant(najbolji_potez):
                     self.sahovska_tabla.push(najbolji_potez)
                     self.crtanje_table()
@@ -1462,12 +1561,14 @@ class Igra:
                     self.sahovska_tabla.push(najbolji_potez)
                     self.crtanje_table()
                     self.pomjeranje_figura(red_zeljeno,kolona_zeljeno,red_selektovano,kolona_selektovano,figura_pocetna,figura_krajnja)
+            #Испис тренутне евалуације позиције у терминалу
             if boja_figura == sah.WHITE:
                 print("Trenutna evaluacija pozicije (-)-crni ima prednost, (+)-bijeli ima prednost):",racunar.evaluacija_pozicije())
             else:
                 print("Trenutna evaluacija pozicije (-)-crni ima prednost, (+)-bijeli ima prednost):",-racunar.evaluacija_pozicije())
             PY.display.update()
             return
+        #Случај када се потез добија из базе отварања (провјера типа потеза је иста као и за прошли случај)
         else:    
             potez_iz_baze = self.otvaranje()
             if potez_iz_baze:
@@ -1540,6 +1641,7 @@ class Igra:
                     print("Trenutna evaluacija pozicije (-)-crni ima prednost, (+)-bijeli ima prednost):",-racunar.evaluacija_pozicije())
                     PY.display.update()
                 return
+            #Случај када се потез добија помоћу минимакс алгоритма 
             else:
                 najbolji_potez= racunar.najboljiPotez()
                 if najbolji_potez.promotion is not None:
@@ -1609,12 +1711,17 @@ class Igra:
                 else:
                     print("Trenutna evaluacija pozicije (-)-crni ima prednost, (+)-bijeli ima prednost):",-racunar.evaluacija_pozicije())
                     PY.display.update()
+#---------------------------------------------------------------------------------------------------------------
+'''Функција pocetakIgre() омогућава уношење почетних параметара игре, наизмјенично позивање функција potezIgraca() и 
+potezRacunara() (играч против рачунара) или само функције potezIgraca() (играч против играча), све док се не дође до неког од коначних исхода.'''
     def pocetakIgre(self):
         boja_igraca=None
         maks_dubina=None
         modIgre=None
+        #Избор типа игре (против играча или рачунара)
         while(modIgre!="igrac" and modIgre!="racunar"):
             modIgre=input("Unesite da li zelite igrati protiv igraca ili racunara (igrac ili racunar):").lower()
+        #Случај када играч игра против рачунара 
         if modIgre=="racunar":
             self.crtanje_table()
             while(boja_igraca!="b" and boja_igraca!="c"):
@@ -1627,23 +1734,33 @@ class Igra:
                     print("Unesena vrednost nije broj! Pokušajte ponovo.")
             pocetna_pozicija=RDK.Item("pocetna_pozicija",robolink.ITEM_TYPE_PROGRAM)
             pocetna_pozicija.RunProgram()
+            #Случај када играч има црне фигуре
             if boja_igraca=="c":
+                '''while петља омогућава да се одвија игра све док се не дође до неког од коначних исхода, 
+                када се излази из петље употребом кључне ријечи break'''
                 while(True):
+                    #Приказивање шаховске табле у терминалу (конзоли)
                     print(self.sahovska_tabla)
                     print("Racunar je na potezu")
                     self.potezRacunara(maks_dubina,sah.WHITE)
+                    '''Провјера да ли је на шаховској табли дошло до мата након потеза рачунара
+                    (ако јесте, на екрану се исписује порука да је рачунар побједио)'''
                     if(self.sahovska_tabla.is_checkmate()==True):
                         print("Racunar je pobjedio")
                         self.ispisivanje_rezultata("Racunar je pobjedio")
                         break
+                    #Провјера да ли је на шаховској табли дошло до пата послије потеза рачунара
                     elif(self.sahovska_tabla.is_stalemate()==True):
                         print("Rezultat je nerjesen (stalemate)!")
                         self.ispisivanje_rezultata("Rezultat je nerjesen (stalemate)!")
                         break
+                    #Провјера да ли је одређена позиција поновљена 5 пута (функција is_fivefold_repetition())
                     elif (self.sahovska_tabla.is_fivefold_repetition()==True):
                         print("Rezultat je nerjesen (fivefold repetition)!")
                         self.ispisivanje_rezultata("Rezultat je nerjesen (fivefold repetition)!")
                         break
+                    '''Провјера да ли je на шаховској табли остало довољно материјала 
+                    (ако нема довољно материјала, партија завршава ремијем)'''
                     elif (self.sahovska_tabla.is_insufficient_material()==True):
                         print("Rezultat je nerjesen (nedovoljno materijala na tabli)")
                         self.ispisivanje_rezultata("Rezultat je nerjesen (nedovoljno materijala na tabli)")
@@ -1669,7 +1786,9 @@ class Igra:
                             self.ispisivanje_rezultata("Rezultat je nerjesen (nedovoljno materijala na tabli)")
                             break 
                 print(self.sahovska_tabla)
+                #Исписивање резултата у конзоли
                 print(self.sahovska_tabla.outcome())
+            #Случај када играч има бијеле фигуре
             elif boja_igraca=="b":
                 while(True):
                     print(self.sahovska_tabla)
@@ -1714,7 +1833,9 @@ class Igra:
                 print(self.sahovska_tabla)
                 print(self.sahovska_tabla.outcome())
             self.sahovska_tabla.reset()
+            #Позив функције pocetakIgre() (уколико желимо играти нову партију)
             self.pocetakIgre()
+        #Случај када играч игра против другог играча
         elif modIgre=="igrac":
             pocetna_pozicija=RDK.Item("pocetna_pozicija",robolink.ITEM_TYPE_PROGRAM)
             pocetna_pozicija.RunProgram()
@@ -1727,6 +1848,7 @@ class Igra:
                 print("-----------------------")
                 print("Lista legalnih poteza")
                 print("-----------------------")
+                #Испис свих легалних потеза за тренутног играча у конзоли
                 print(list(self.sahovska_tabla.legal_moves))
                 print("------------------------------")
                 self.potezIgraca()
@@ -1777,14 +1899,18 @@ class Igra:
             print(self.sahovska_tabla.outcome())  
             self.sahovska_tabla.reset()
             self.pocetakIgre()
-#Automatsko dobijanje pocetne pozicije robota
-'''if robot.Connect()>0:
+#Провјера успјешности конекције са роботом
+if robot.Connect()>0:
+    #Аутоматско добијање почетне позиције робота
     robot.Joints()
     print("Uspjelo je povezivanje sa robotom")
 else:
-    raise Exception("Nije uspjelo povezivanje sa robotom")'''
+    raise Exception("Nije uspjelo povezivanje sa robotom")
+#Креирање објекта шаховске табле
 sahovska_tabla=sah.Board()
+#Креирање објекта класе Igra
 Sahovska_igra=Igra(sahovska_tabla)
+#Позив функције pocetakIgre()
 Sahovska_igra.pocetakIgre()
 
 
