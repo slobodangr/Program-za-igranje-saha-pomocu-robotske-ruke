@@ -1,3 +1,4 @@
+#Импортовање основних библиотека и модула
 import chess as sah
 import math as math
 import random as rd
@@ -12,20 +13,26 @@ robot=RDK.Item("robot")
 brojac_pojedenih_bijele=0
 brojac_pojedenih_crne=0
 #-----------------------------------------------------------------------------------------------------------------------------------------Klasa sahEngine
+#Класа ChessEngine
 class sahEngine:
     #Konstruktor klase ChessEngine
     def __init__(self,sahovska_tabla,dubina_pretrazivanja,boja_figura):
         self.sahovska_tabla=sahovska_tabla                              
         self.dubina_pretrazivanja=dubina_pretrazivanja
-        self.boja_figura=boja_figura   
+        self.boja_figura=boja_figura 
+#---------------------------------------------------------------------------------------------------------------
+#Главна функција за евалуацију позиције
     def evaluacija_pozicije(self):
         vrijednost=0
         for i in range(64):
             vrijednost+=self.vrijednost_figura(sah.SQUARES[i])
         return vrijednost+self.provjera_mata()+0.001*rd.random()+self.provjera_centralnih_polja()+self.provjer_stalemate()
-    
+#---------------------------------------------------------------------------------------------------------------
+#Функција која позива Minimax функцију са почетним параметрима
     def najboljiPotez(self):
         return self.Minimax(None, 1)
+#---------------------------------------------------------------------------------------------------------------
+#Функција која провјерава контролу централних поља
     def provjera_centralnih_polja(self):
         vrijednost_centralnih_polja = 0
         centralna_polja = [sah.D4, sah.E4, sah.C4, sah.F4, sah.D5, sah.C5, sah.F5, sah.E5]
@@ -35,7 +42,8 @@ class sahEngine:
             if self.sahovska_tabla.is_attacked_by(not self.boja_figura, polje):
                 vrijednost_centralnih_polja -= 0.05
         return vrijednost_centralnih_polja
-    
+#---------------------------------------------------------------------------------------------------------------
+    #Функција која враћа евалуацију позиције ако је на шаховској табли пет или мање фигура, укључујући краљеве
     def gaviot_tablebase(self):
         evaluacija=None
         putanja=r"C:\Users\Korisnik\Desktop\3-4-5"
@@ -66,7 +74,8 @@ class sahEngine:
                            else -evaluacija
             except chess.gaviota.MissingTableError:
                 return None
-            
+#---------------------------------------------------------------------------------------------------------------
+#Функција која провјера да ли је на шаховској табли дошло до мата       
     def provjera_mata(self):
         if (self.sahovska_tabla.is_checkmate()==True):
             if(self.sahovska_tabla.turn==self.boja_figura):
@@ -75,7 +84,8 @@ class sahEngine:
                 return 1000
         else:
             return 0
-        
+#---------------------------------------------------------------------------------------------------------------
+#Функција која провјера да ли је на шаховској табли дошло до пата     
     def provjer_stalemate(self):
         if (self.sahovska_tabla.is_stalemate()==True):
             if(self.sahovska_tabla.turn==self.boja_figura):
@@ -83,7 +93,8 @@ class sahEngine:
             else:
                 return -500
         return 0
-    
+#---------------------------------------------------------------------------------------------------------------
+#Функција која има улогу да врати вриједност фигуре која се налази на одређеном шаховском пољу
     def vrijednost_figura(self,polje):# Шаховско поље се просљеђује као аргумент
         vrijednost_fig=0
         #Додјељивање вриједности промјењивој vrijednost_fig у зависности од типа фигуре
@@ -102,7 +113,8 @@ class sahEngine:
             return -vrijednost_fig
         else:
             return vrijednost_fig
-        
+#---------------------------------------------------------------------------------------------------------------
+#Функција Minimax служи за проналажење најбољег потеза за одређену шаховску позицију и у њој је имплеметиран минимакс алгоритам
     def Minimax(self,current_eval,dubina):
         najbolji_potez=None
         '''Bazni uslov minimaks funckije[1]'''
@@ -148,6 +160,8 @@ class sahEngine:
 #---------------------------------------------------------------------------------------------------------------------------------klasa Igra
         
 class Igra:
+#Конструктор класе Igra
+#Oсновни атрибути ове класу су: шаховска табла, величина поља, димензије плоче, слике фигура и плоча. Класа садржи и једну методу, која се назива crtanje_table().
     def __init__(self,sahovska_tabla=sah.Board()):
         self.sahovska_tabla=sahovska_tabla
         self.velicina_polja=80
